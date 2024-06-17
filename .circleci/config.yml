@@ -3,7 +3,6 @@ version: 2.1
 
 orbs:
   android: circleci/android@1.0.3
-  flutter: circleci/flutter@2.0.4
 
 jobs:
   build:
