@@ -1,9 +1,8 @@
 version: 2.1
 jobs:
-  build:
-    executor:
-      name: android/android-machine
-      resource-class: medium
+  build-and-deploy:
+    docker:
+      - image: circleci/flutter:latest
     steps:
       - checkout
       - run:
