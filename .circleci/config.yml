@@ -1,43 +1,55 @@
-# Couldn't automatically generate a config from your source code.
-# This is a generic template to serve as a base for your custom config
-# See: https://circleci.com/docs/configuration-reference
+
 version: 2.1
+
+orbs:
+  android: circleci/android@1.0.3
+  flutter: circleci/flutter@1.1.0
+
 jobs:
-  test:
-    docker:
-      - image: cimg/base:stable
-    steps:
-      - checkout
-      # Replace this with a real test runner invocation
-      - run:
-          name: Run tests
-          command: echo 'replace me with real tests!' && false
   build:
-    docker:
-      - image: cimg/base:stable
+    executor:
+      name: android/android-machine
+      resource-class: medium
+    
     steps:
       - checkout
-      # Replace this with steps to build a package, or executable
+
+      - flutter/install_sdk: 
+          version: 3.7.9
+
+      - flutter/install_pub:
+          cache-version: v1
+
+    
       - run:
-          name: Build an artifact
-          command: touch example.txt
+          name: Add Google services to App
+          command: |
+            echo "$GOOGLE_SERVICES" | base64 --decode > android/app/google-services.json
+
+      - run:
+          name: Flutter pub get
+          command: |
+            flutter pub get
+
+      - run:
+          name: Build APK
+          command: |
+            flutter build apk
+
       - store_artifacts:
-          path: example.txt
-  deploy:
-    docker:
-      - image: cimg/base:stable
-    steps:
-      # Replace this with steps to deploy to users
+          path: build/app/outputs/flutter-apk/app-release.apk
+
       - run:
-          name: deploy
-          command: '#e.g. ./deploy.sh'
-workflows:
-  example:
-    jobs:
-      - test
-      - build:
-          requires:
-            - test
-      - deploy:
-          requires:
-            - test
+          name: "Install Firebase CLI"
+          command: |
+            curl -sL firebase.tools | bash
+
+      - run:
+          name: Distribute app For testing
+          command: |  
+            export GOOGLE_APPLICATION_CREDENTIALS="$(pwd)/android/app/google-services.json"  
+            DATE=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+            firebase appdistribution:distribute build/app/outputs/flutter-apk/app-release.apk  \
+            --groups "flutter_circle_ci_demo_tester" \
+            --app "$FIREBASE_APP_ID"  \
+            --release-notes "Version: 1.0.0" 
