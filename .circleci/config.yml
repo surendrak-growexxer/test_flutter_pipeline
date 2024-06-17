@@ -6,8 +6,6 @@ jobs:
     executor:
       name: android/android-machine
       resource-class: medium
-    
-  
       - run:
           name: Add Google services to App
           command: |
