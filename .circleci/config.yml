@@ -1,13 +1,19 @@
 
 version: 2.1
 
+orbs:
+  android: circleci/android@1.0.3
+  flutter: circleci/flutter@1.1.0
+
 jobs:
   build:
     executor:
       name: android/android-machine
       resource-class: medium
       
-    steps:
+     steps:
+      - checkout
+      
       - run:
           name: Add Google services to App
           command: |
