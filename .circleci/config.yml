@@ -1,10 +1,25 @@
 version: 2.1
+
+orbs:
+  android: circleci/android@1.0.3
+  flutter: circleci/flutter@1.1.0
+
 jobs:
-  build-and-deploy:
-    docker:
-      - image: circleci/flutter:latest
+  build:
+    executor:
+      name: android/android-machine
+      resource-class: medium
+    
     steps:
       - checkout
+
+      - flutter/install_sdk: 
+          version: 3.7.9
+
+      - flutter/install_pub:
+          cache-version: v1
+
+    
       - run:
           name: Add Google services to App
           command: |
@@ -36,4 +51,4 @@ jobs:
             firebase appdistribution:distribute build/app/outputs/flutter-apk/app-release.apk  \
             --groups "flutter_circle_ci_demo_tester" \
             --app "$FIREBASE_APP_ID"  \
-            --release-notes "Version: 1.0.0" 
+            --release-notes "Version: 1.0.0"
