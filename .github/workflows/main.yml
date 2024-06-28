@@ -15,7 +15,7 @@ jobs:
       - name: Set up Ruby
         uses: ruby/setup-ruby@v1
         with:
-          ruby-version: 5.1.1
+          ruby-version: 3.1.0
 
       - name: Set up fastlane
         run: gem install fastlane
